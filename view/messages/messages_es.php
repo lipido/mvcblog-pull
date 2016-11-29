@@ -23,6 +23,7 @@ array(
 	"Register" => "Registro",
 	"Edit" => "Editar",
 	"Delete" => "Eliminar",
+	"Add" => "Añadir",
 	"Create post" => "Crear artículo",
 	"Comments" => "Comentarios",
 	"Write a comment" => "Escribe un comentario",
@@ -32,6 +33,7 @@ array(
 	"Spanish" => "Español",
 	"English" => "Inglés",
 	"Welcome to the Blog App!" => "¡Bienvenido a la App Blog!",
-	"are you sure?" => "¿Estás seguro?"
+	"are you sure?" => "¿Estás seguro?",
+	"Registered users" => "Usuarios registrados"
 )
 ?>

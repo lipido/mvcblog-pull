@@ -3,16 +3,17 @@
 
 require_once(__DIR__."/../../core/ViewManager.php");
 $view = ViewManager::getInstance();
-$currentuser = $view->getVariable("currentusername");
+
+$usersC = ComponentFactory::getComponent("users");
 
 ?><!DOCTYPE html>
 <html>
 <head>
-	<title><?= $view->getVariable("title", "no title") ?></title>
+	<title><?= $view->getFragment("title") ?></title>
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="css/style.css" type="text/css">
 	<!-- enable ji18n() javascript function to translate inside your scripts -->
-	<script src="index.php?controller=language&amp;action=i18njs">
+	<script src="index.php?view=messages/i18njs">
 	</script>
 	<?= $view->getFragment("css") ?>
 	<?= $view->getFragment("javascript") ?>
@@ -21,27 +22,23 @@ $currentuser = $view->getVariable("currentusername");
 	<!-- header -->
 	<header>
 		<h1>Blog</h1>
-		<nav id="menu" style="background-color:grey">
+		<nav id="menu">
 			<ul>
-				<li><a href="index.php?controller=posts&amp;action=index">Posts</a></li>
+				<li><a href="index.php?view=posts">Posts</a></li>
 
-				<?php if (isset($currentuser)): ?>
-					<li><?= sprintf(i18n("Hello %s"), $currentuser) ?>
-						<a 	href="index.php?controller=users&amp;action=logout">(Logout)</a>
+				<?php if ($usersC->getCurrentUser() !== null): ?>
+					<li><?= sprintf(i18n("Hello %s"), $usersC->getCurrentUser()->getUsername()) ?>
+						<a 	href="index.php?view=<?=$_GET['view']?>&amp;component=users&amp;event=logout">(Logout)</a>
 					</li>
 
 				<?php else: ?>
-					<li><a href="index.php?controller=users&amp;action=login"><?= i18n("Login") ?></a></li>
+					<li><a href="index.php?view=login"><?= i18n("Login") ?></a></li>
 				<?php endif ?>
 			</ul>
 		</nav>
 	</header>
 
 	<main>
-		<div id="flash">
-			<?= $view->popFlash() ?>
-		</div>
-
 		<?= $view->getFragment(ViewManager::DEFAULT_FRAGMENT) ?>
 	</main>
 
@@ -49,6 +46,9 @@ $currentuser = $view->getVariable("currentusername");
 		<?php
 		include(__DIR__."/language_select_element.php");
 		?>
+		<!-- example of the pull-based framework. We are retrieving values using
+				 more than one component -->
+		<?= i18n('Registered users') ?>: <?= $usersC->getUserCount() ?>
 	</footer>
 
 </body>

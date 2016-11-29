@@ -64,4 +64,16 @@ class UserMapper {
 			return true;
 		}
 	}
+
+	/**
+	* Gets user count
+	*
+	* @return int the user count.
+	*/
+	public function userCount() {
+		$stmt = $this->db->prepare("SELECT count(username) FROM users");
+		$stmt->execute();
+
+		return $stmt->fetchColumn();
+	}
 }

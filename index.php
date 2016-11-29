@@ -1,31 +1,38 @@
 <?php
 // file: index.php
+require_once(__DIR__."/core/ComponentFactory.php");
+require_once(__DIR__."/core/ViewManager.php");
+require_once(__DIR__."/core/I18n.php");
 
 /**
-* Default controller if any controller is passed in the URL
+* Default view if none is provided in the request parameter
 */
-define("DEFAULT_CONTROLLER", "posts");
+define("DEFAULT_VIEW", "posts");
 
-/**
-* Default action if any action is passed in the URL
-*/
-define("DEFAULT_ACTION", "index");
+
 
 /**
 * Main router (single entry-point for all requests)
-* of the MVC implementation.
+* of the pull-based MVC implementation.
 *
-* This router will create an instance of the corresponding
-* controller, based on the "controller" parameter and call
-* the corresponding method, based on the "action" parameter.
+* This method will dispatch an event, if there are the component
+* and event parameters in the request, calling the corresponding component's
+* method.
 *
 * The rest of GET or POST parameters should be handled by
-* the controller itself.
+* the component itself.
+*
+* After the event-dispatch (if any), a view is rendered. The view to render
+* could be (i) the view returned by the event method (if it returns a value)
+* or (ii) the view given by parameter in the current request.
 *
 * Parameters:
 * <ul>
-* <li>controller: The controller name (via HTTP GET)
-* <li>action: The name inside the controller (via HTTP GET)
+* <li>view: Mandatory, the view to render if there is no event or the event
+* method does not return a new view. (via HTTP GET)</li>
+* <li>component: The component dispatching the event. (via HTTP GET)</li>
+* <li>event: The method inside the component dispatching the event.
+* (via HTTP GET)</li>
 * </ul>
 *
 * @return void
@@ -33,58 +40,75 @@ define("DEFAULT_ACTION", "index");
 * @author lipido <lipido@gmail.com>
 */
 function run() {
-	// invoke action!
+
 	try {
-		if (!isset($_GET["controller"])) {
-			$_GET["controller"] = DEFAULT_CONTROLLER;
+
+		if (isset($_REQUEST["view"])) {
+			// We will put this value in the $_REQUEST as a global handle to know
+			// who is the current view during the request lifecycle, since it changes
+			// during the event dispatch (if the event returns a view).
+			// This, for example, will affect the ComponentFactory to retrieve the
+			// view-scoped components.
+			$_REQUEST["__current_view"] = $_REQUEST["view"];
+		}
+		// event-dispatch, if any
+		if (isset($_REQUEST["component"]) && isset($_REQUEST["event"])) {
+			// we have an event!
+			$component = ComponentFactory::getComponent($_GET["component"]);
+			$eventName = $_GET["event"];
+
+			// invoke the event
+			$eventReturnView = $component->$eventName();
+
+			// some events can return the view to navigate to
+			if (isset($eventReturnView)) {
+				$view = preg_replace('/:redirect$/','', $eventReturnView);
+				if ($view != $_REQUEST["view"] && $view !== ":redirect") {
+					// goint to another view, clear view scope
+					if (isset($_REQUEST["__current_view"])) {
+						ComponentFactory::clearViewScope($_REQUEST["__current_view"]);
+					}
+					ComponentFactory::clearViewScope($view);
+				}
+			}
 		}
 
-		if (!isset($_GET["action"])) {
-			$_GET["action"] = DEFAULT_ACTION;
+		// no view from event, get the current view from the request parameter
+		if (
+				(!isset($eventReturnView)	|| (isset($eventReturnView) && $eventReturnView == ":redirect"))
+				&& isset($_REQUEST["view"])
+		) {
+			$view = $_REQUEST["view"];
+		} else if (!isset($view)) {
+			$view = DEFAULT_VIEW;
 		}
 
-		// Here is where the "magic" occurs.
-		// URLs like: index.php?controller=posts&action=add
-		// will provoke a call to: new PostsController()->add()
+		$_REQUEST["__current_view"] = $view;
 
-		// Instantiate the corresponding controller
-		$controller = loadController($_GET["controller"]);
+		if(!isset($_REQUEST["event"])) {
+			// skip view-scope clearing if we are reaching via redirect to the same page
+			if (!isset($_REQUEST["_noclear"])) {
+				// no event, and no _noclear, seems to be a fresh arrival, clear view-scope
+				ComponentFactory::clearViewScope($_REQUEST["__current_view"]);
+			}
+		}
 
-		// Call the corresponding action
-		$actionName = $_GET["action"];
-		$controller->$actionName();
+		// if the view ends with ":redirect", we perform a HTTP redirect instead of
+		// a simple include of the view in the same request
+		if (isset($eventReturnView) && preg_match('/.+:redirect$/', $eventReturnView)) {
+			ViewManager::getInstance()->redirect(substr($eventReturnView, 0, -9));
+		} else if (isset($eventReturnView) && $eventReturnView == ":redirect") {
+			// if we redirect to the same page, do not clear the view-scoped components
+			ViewManager::getInstance()->redirectToReferer("_noclear=");
+		} else {
+			ViewManager::getInstance()->render($view);
+		}
+
 	} catch(Exception $ex) {
 		//uniform treatment of exceptions
 		die("An exception occured!!!!!".$ex->getMessage());
 	}
 }
 
-/**
-* Load the required controller file and create the controller instance
-*
-* @param string $controllerName The controller name found in the URL
-* @return Object A Controller instance
-*/
-function loadController($controllerName) {
-	$controllerClassName = getControllerClassName($controllerName);
-
-	require_once(__DIR__."/controller/".$controllerClassName.".php");
-	return new $controllerClassName();
-}
-
-/**
-* Obtain the class name for a controller name in the URL
-*
-* For example $controllerName = "users" will return "UsersController"
-*
-* @param $controllerName The name of the controller found in the URL
-* @return string The controller class name
-*/
-function getControllerClassName($controllerName) {
-	return strToUpper(substr($controllerName, 0, 1)).substr($controllerName, 1)."Controller";
-}
-
 //run!
 run();
-
-?>
