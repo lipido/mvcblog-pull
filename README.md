@@ -61,6 +61,11 @@ accordingly to events. However, attending an event in a request does not mean
 that the affected component will be the single-one in the views that will display
 the next page to the user.
 
+The following figure shows the difference between the *push* (top) model and the
+*pull* (bottom) model.
+
+![push vs pull](push_vs_pull.png)
+
 ## URLs structure
 Each request is directed to the same entry point, indicating the `view` as a
 request parameter, which is always **mandatory**.
