@@ -24,7 +24,7 @@ respectively.
 generating the data views and user input. Views use one or several *components*.
 3. **Components**. Components are PHP classes which
 support all the logic needed by views. Components represent the state (rendered
-by views), as well as well as behavior by attending user *events* (coming from
+by views), as well as behavior by attending user *events* (coming from
 views). Regarding their state, components can have different *scopes*.
   1. *Request* scope (default). The *component* is instantiated and destroyed
 	in each HTTP request.
@@ -39,7 +39,7 @@ retrieve components taking into account their scope. Normally, components are
 requested and used inside views, but you can use components from another
 components.
 - A view helper class (`ViewManager`), which includes a layout system for the views.
-	All your views are embedded inside _layouts_, which contain all the repetivive
+	All your views are embedded inside _layouts_, which contain all the repetitive
 	HTML (headers, footers, css declarations, etc). You can use more than one
 	layout if you want (in the example, we use two layouts).
 - An simple internationalization helper class (`I18n`).
