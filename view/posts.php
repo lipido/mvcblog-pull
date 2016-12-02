@@ -1,15 +1,12 @@
 <?php
 //file: view/blog-home.php
 
-$view = ViewManager::getInstance();
+ViewManager::getInstance()->setFragmentContent("title", i18n('Posts'));
+
+// get components to use in this view
 $postsC = ComponentFactory::getComponent("posts");
 $usersC = ComponentFactory::getComponent("users");
-
 ?>
-<?php $view->moveToFragment("title"); ?>
-<?=i18n('Posts')?>
-<?php $view->moveToDefaultFragment(); ?>
-
 <h1><?=i18n("Posts")?></h1>
 
 <!-- Add new Post form -->

@@ -1,13 +1,12 @@
 <?php
 //file: view/users/login.php
 
-$view = ViewManager::getInstance();
-$view->setLayout("welcome");
+ViewManager::getInstance()->setFragmentContent("title", i18n('Login'));
+ViewManager::getInstance()->setLayout("welcome");
+
+// get components to use in this view
 $usersC = ComponentFactory::getComponent("users");
 ?>
-<?php $view->moveToFragment("title"); ?>
-<?=i18n('Login')?>
-<?php $view->moveToDefaultFragment(); ?>
 <h1><?= i18n("Login") ?></h1>
 <?= isset($usersC->getLoginErrors()["general"])?$usersC->getLoginErrors()["general"]:"" ?>
 
@@ -18,6 +17,6 @@ $usersC = ComponentFactory::getComponent("users");
 </form>
 
 <p><?= i18n("Not user?")?> <a href="index.php?view=register"><?= i18n("Register here!")?></a></p>
-<?php $view->moveToFragment("css");?>
+<?php ViewManager::getInstance()->moveToFragment("css");?>
 <link rel="stylesheet" type="text/css" src="css/style2.css">
-<?php $view->moveToDefaultFragment(); ?>
+<?php ViewManager::getInstance()->moveToDefaultFragment(); ?>

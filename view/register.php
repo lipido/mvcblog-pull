@@ -1,13 +1,13 @@
 <?php
 //file: view/register.php
 
-$view = ViewManager::getInstance();
-$view->setLayout("welcome");
+ViewManager::getInstance()->setFragmentContent("title", i18n('Login'));
+ViewManager::getInstance()->setLayout("welcome");
+
+// get components to use in this view
 $usersC = ComponentFactory::getComponent("users");
 ?>
-<?php $view->moveToFragment("title"); ?>
-<?=i18n('Login')?>
-<?php $view->moveToDefaultFragment(); ?>
+
 <h1><?= i18n("Register")?></h1>
 <form action="index.php?view=register&amp;component=users&amp;event=register" method="POST">
 	<?= i18n("Username")?>: <input type="text" name="username"

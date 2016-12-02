@@ -1,15 +1,12 @@
 <?php
 //file: view/posts/view.php
-$view = ViewManager::getInstance();
+ViewManager::getInstance()->setFragmentContent("title", i18n('Post'));
 
 $postsC = ComponentFactory::getComponent("posts");
 $commentsC = ComponentFactory::getComponent("comments");
 $usersC = ComponentFactory::getComponent("users");
 
 ?><h1><?= i18n("Post").": ".htmlentities($postsC->getCurrentPost()->getTitle()) ?></h1>
-<?php $view->moveToFragment("title"); ?>
-<?=i18n('Post')?>
-<?php $view->moveToDefaultFragment(); ?>
 
 <em><?= sprintf(i18n("by %s"),$postsC->getCurrentPost()->getAuthor()->getUsername()) ?></em>
 <p>

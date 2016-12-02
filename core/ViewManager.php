@@ -114,6 +114,18 @@ class ViewManager {
 	}
 
 	/**
+	*	Shortcut method to set the content for a fragment directly without the need
+	* to move to the specified fragment with moveToFragment(). The
+	* current fragment is not changed.
+	*
+	* @param string fragmentName the fragment to set the content
+	* @param string content the content for the fragment
+	*/
+	public function setFragmentContent($fragmentName, $content) {
+		$this->fragmentContents[$fragmentName] = $content;
+	}
+
+	/**
 	* Gets the contents occumulated in an specified fragment
 	*
 	* @param string $fragment The fragment to retrieve the contents from
